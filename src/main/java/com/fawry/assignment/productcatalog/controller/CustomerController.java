@@ -7,10 +7,8 @@ import com.fawry.assignment.productcatalog.model.Customer;
 import com.fawry.assignment.productcatalog.model.Login;
 import com.fawry.assignment.productcatalog.service.CustomerService;
 import com.fawry.assignment.productcatalog.service.LoginService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/customers")
@@ -26,6 +24,7 @@ public class CustomerController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public CustomerResponseDto addCustomer(@RequestBody CustomerRequestDto requestDto){
 
         Customer customer = CustomerMapper.INSTANCE.toCustomer(requestDto);

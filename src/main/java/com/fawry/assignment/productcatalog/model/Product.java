@@ -28,16 +28,12 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<Variant> variants;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     @JsonIgnore
     private Category category;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "product_has_orders", joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "orders_id"))
-    @JsonIgnore
-    private List<Order> orders;
+
 
 
 }

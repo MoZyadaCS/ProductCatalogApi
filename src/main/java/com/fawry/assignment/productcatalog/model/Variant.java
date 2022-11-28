@@ -30,9 +30,12 @@ public class Variant {
 
 
 
-
-
-    @ManyToOne
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "order_has_variants", joinColumns = @JoinColumn(name = "variant_id"),
+            inverseJoinColumns = @JoinColumn(name = "orders_id"))
+    @JsonIgnore
+    private List<Order> orders;
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id")
     @JsonIgnore
     private Product product;

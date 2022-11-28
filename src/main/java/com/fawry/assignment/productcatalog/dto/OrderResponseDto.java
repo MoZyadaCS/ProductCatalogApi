@@ -9,6 +9,8 @@ public class OrderResponseDto {
 
     private String customerName;
     private double totalPrice;
-    private List<String> products;
+    private List<String> variantNames;
+    private int limit;
+    private boolean isBought;
 
 }

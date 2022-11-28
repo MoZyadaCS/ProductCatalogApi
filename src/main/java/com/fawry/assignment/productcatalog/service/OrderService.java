@@ -31,4 +31,11 @@ public class OrderService {
     public List<Order> getAllByCustomerId(Long id){
         return this.orderRepository.getAllByCustomer_Id(id);
     }
+
+    public Order updateOrder(Order order){
+        Order managedOrder = this.orderRepository.findById(order.getId()).orElseThrow();
+        managedOrder.setVariants(order.getVariants());
+        managedOrder.setTotalPrice(order.getTotalPrice());
+        return managedOrder;
+    }
 }

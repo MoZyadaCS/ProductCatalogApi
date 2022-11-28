@@ -3,13 +3,11 @@ package com.fawry.assignment.productcatalog.service;
 import com.fawry.assignment.productcatalog.model.Variant;
 import com.fawry.assignment.productcatalog.repository.ProductRepository;
 import com.fawry.assignment.productcatalog.repository.VariantRepository;
-import org.apache.tomcat.util.http.fileupload.util.Streams;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 @Service
 public class VariantService {
@@ -25,6 +23,7 @@ public class VariantService {
 
 
     public Variant add(Variant variant) {
+        variant.setProduct(productRepository.findById(variant.getProduct().getId()).orElseThrow());
         return this.variantRepository.save(variant);
     }
 
@@ -40,5 +39,17 @@ public class VariantService {
 
     public Variant getById(Long id) {
         return this.variantRepository.findById(id).orElseThrow();
+    }
+
+    public List<Variant> getAll() {
+        return this.variantRepository.findAll();
+    }
+
+    public Variant updateVariant(Variant variant) {
+        Variant managedVariant = variantRepository.findById(variant.getId()).orElseThrow();
+        managedVariant.setQuantity(variant.getQuantity());
+        managedVariant.setPrice(variant.getPrice());
+        managedVariant.setLimit(variant.getLimit());
+        return managedVariant;
     }
 }
