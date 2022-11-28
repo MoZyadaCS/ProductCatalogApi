@@ -1,8 +1,13 @@
 package com.fawry.assignment.productcatalog.controller;
 
+import com.fawry.assignment.productcatalog.dto.ProductRequestDto;
+import com.fawry.assignment.productcatalog.dto.ProductResponseDto;
+import com.fawry.assignment.productcatalog.mapper.ProductMapper;
 import com.fawry.assignment.productcatalog.model.Product;
+import com.fawry.assignment.productcatalog.service.CategoryService;
 import com.fawry.assignment.productcatalog.service.ProductService;
 import com.fawry.assignment.productcatalog.service.VariantService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,47 +22,60 @@ public class ProductController {
 
     private final VariantService variantService;
 
+    private final CategoryService categoryService;
 
 
 
-    public ProductController(ProductService productService, VariantService variantService) {
+
+    public ProductController(ProductService productService, VariantService variantService, CategoryService categoryService) {
         this.productService = productService;
         this.variantService = variantService;
+        this.categoryService = categoryService;
     }
 
     @PostMapping
-    public Product addProduct(@RequestBody Product product){
-        product.getVariants().forEach(variant -> variant.setProduct(product));
-        Product product1 = productService.addProduct(product);
-        product.getVariants().forEach(variantService::add);
-        return product1;
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductResponseDto addProduct(@RequestBody ProductRequestDto requestDto){
+        Product product = ProductMapper.INSTANCE.toProduct(requestDto);
+        if(product.getVariants() != null) {
+            product.setVariants(product.getVariants().stream().map(variant -> variantService.getById(variant.getId())).toList());
+            product.getVariants().forEach(variant -> variant.setProduct(product));
+        }
+        if(requestDto.getCategory() != null) product.setCategory(categoryService.findById(requestDto.getCategory().getId()));
+        return ProductMapper.INSTANCE.toResponseDto(productService.addProduct(product));
+
     }
 
     @GetMapping
-    public List<Product> getAllProducts(){
-        return this.productService.getAll();
+    @ResponseStatus(HttpStatus.FOUND)
+    public List<ProductResponseDto> getAllProducts(){
+        return this.productService.getAll().stream().map(ProductMapper.INSTANCE::toResponseDto).toList();
     }
 
 
     @PutMapping
-    public Product updateProduct(@RequestBody Product product){
+    @ResponseStatus(HttpStatus.OK)
+    public ProductResponseDto updateProduct(@RequestBody ProductRequestDto requestDto){
 
-        return this.productService.updateProduct(product);
+        return ProductMapper.INSTANCE.toResponseDto(this.productService.updateProduct(ProductMapper.INSTANCE.toProduct(requestDto)));
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProduct(@PathVariable Long id){
         this.productService.deleteProduct(id);
     }
 
     @GetMapping("/{name}")
-    public List<Product> getAllProductsByCategory(@PathVariable String name){
-        return this.productService.getAllProductsByCategory(name);
+    @ResponseStatus(HttpStatus.FOUND)
+    public List<ProductResponseDto> getAllProductsByCategory(@PathVariable String name){
+        return this.productService.getAllProductsByCategory(name).stream().map(ProductMapper.INSTANCE::toResponseDto).toList();
     }
 
     @GetMapping("/sorted")
-    public List<Product> getAllSorted(){
-        return this.productService.getAllSortedByPopularity();
+    @ResponseStatus(HttpStatus.FOUND)
+    public List<ProductResponseDto> getAllSorted(){
+        return this.productService.getAllSortedByPopularity().stream().map(ProductMapper.INSTANCE::toResponseDto).toList();
     }
 
 }

@@ -16,11 +16,14 @@ public class Order {
     @Column(name = "total_price")
     private double totalPrice;
 
+    @Column(name = "isBought")
+    private boolean isBought;
+
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
     @ManyToMany(mappedBy = "orders", fetch = FetchType.EAGER)
-    private List<Product> products;
+    private List<Variant> variants;
 
 }
